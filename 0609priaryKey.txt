@@ -1,0 +1,132 @@
+SQL> --현재보유한테이블을조사하자
+SQL> select table_name from user_tables;
+
+TABLE_NAME                                                                      
+------------------------------------------------------------                    
+PET                                                                             
+MEMBER                                                                          
+DEPT                                                                            
+EMP                                                                             
+CLASS                                                                           
+MEMBER2                                                                         
+MEMBER3                                                                         
+MEMBER4                                                                         
+
+8 rows selected.
+
+SQL> ed
+Wrote file afiedt.buf
+
+  1  create table member5(
+  2  	idx number pimary key
+  3  	, id varchar2(20) unique not null
+  4  	, age number 
+  5  	, constraint chk_member5 check(age>18)
+  6  	, point number default 1000
+  7  	, regdate date default sysdate
+  8* )
+SQL> /
+	idx number pimary key
+	           *
+ERROR at line 2:
+ORA-00907: missing right parenthesis 
+
+
+SQL> ed
+Wrote file afiedt.buf
+
+  1  create table member5(
+  2  	idx number primary key
+  3  	, id varchar2(20) unique not null
+  4  	, age number 
+  5  	, constraint chk_member5 check(age>18)
+  6  	, point number default 1000
+  7  	, regdate date default sysdate
+  8* )
+SQL> /
+
+Table created.
+
+SQL> --시퀀스 sequence란?
+SQL> --오직 숫자만을 증가시켜주는 테이블
+SQL> --즉, 개발자 대신에 순서있는 숫자를 생성해줌
+SQL> create sequence seq_member5
+  2  increment by 1
+  3  start with 1;
+
+Sequence created.
+
+SQL> ed
+Wrote file afiedt.buf
+
+  1  create sequence seq_member5
+  2  increment by 1
+  3* start with 1
+SQL> desc member5;
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ IDX                                       NOT NULL NUMBER
+ ID                                        NOT NULL VARCHAR2(20)
+ AGE                                                NUMBER
+ POINT                                              NUMBER
+ REGDATE                                            DATE
+
+SQL> ed
+Wrote file afiedt.buf
+
+  1  insert into member5(idx, id, age)
+  2* values(seq_member5. nextval, 'batman', 20)
+SQL> /
+
+1 row created.
+
+SQL> select * from member5;
+
+       IDX ID                                              AGE      POINT       
+---------- ---------------------------------------- ---------- ----------       
+REGDATE                                                                         
+--------                                                                        
+         1 batman                                           20       1000       
+23/06/09                                                                        
+                                                                                
+
+SQL> set line 250;
+SQL> select * from member5;
+
+       IDX ID                                              AGE      POINT REGDATE                                                                                                                                                                         
+---------- ---------------------------------------- ---------- ---------- --------                                                                                                                                                                        
+         1 batman                                           20       1000 23/06/09                                                                                                                                                                        
+
+SQL> /
+
+       IDX ID                                              AGE      POINT REGDATE                                                                                                                                                                         
+---------- ---------------------------------------- ---------- ---------- --------                                                                                                                                                                        
+         1 batman                                           20       1000 23/06/09                                                                                                                                                                        
+
+SQL> ed
+Wrote file afiedt.buf
+
+  1  insert into member5(idx, id, age)
+  2* values(seq_member5.nextval, 'xman', 34)
+SQL> /
+
+1 row created.
+
+SQL> select * from member5;
+
+       IDX ID                                              AGE      POINT REGDATE                                                                                                                                                                         
+---------- ---------------------------------------- ---------- ---------- --------                                                                                                                                                                        
+         1 batman                                           20       1000 23/06/09                                                                                                                                                                        
+         2 xman                                             34       1000 23/06/09                                                                                                                                                                        
+
+SQL> delete member5 where idx=1;
+
+1 row deleted.
+
+SQL> select * from member5;
+
+       IDX ID                                              AGE      POINT REGDATE                                                                                                                                                                         
+---------- ---------------------------------------- ---------- ---------- --------                                                                                                                                                                        
+         2 xman                                             34       1000 23/06/09                                                                                                                                                                        
+
+SQL> spool off

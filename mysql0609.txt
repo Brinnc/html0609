@@ -1,0 +1,26 @@
+★브랜치 만들기
+git merge
+git switch master /
+git switch test
+
+
+
+create table member2(
+	idx int primary key auto_increment
+	, id varchar(20) unique
+	, age int 
+	, constraint chk_member2 check(age>18)
+	, point int default 1000
+	, regdate timestamp default now()
+	) default character set utf8;
+
+--------------
+insert into member2(id, age) values('scott', 28);
+insert into member2(id, age) values('adams', 28);
+insert into member2(id, age) values('king', 28);
+
+
+!데이터가 중복되면 물리적으로 별도의 테이블로 분리하자★★★★★
+->정규화(regulation)
+
+!외래키: 자식테이블이 외부에 있는 ★부모테이블의 primary key★를 보유하고 있을 때 그것을 외래키
