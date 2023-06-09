@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>슈퍼마리오_중력적용게임</title>
+    <style>
+        body {
+            margin: 0%;
+        }
+
+        #wrapper {
+            width: 1000px;
+            height: 800px;
+            background: skyblue;
+            margin: auto;
+            position: relative;
+        }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="../js/lib.js"></script>
+    <script src="./GameObject.js"></script>
+    <script src="./Brick.js"></script>
+    <script src="./Mario.js"></script>
+    <script src="./Sensor.js"></script>
+    <script>
+        let wrapper;
+        let mario;
+        let g = 0.06; //중력을 표현한 전역변수
+
+        let flag = true; //루프 수행 여부를 결정짓는 논리값
+
+        //충돌체크를 반복문으로 처리하려면 벽돌은 배열에 들어있어야함.
+        let brickArray = []; //벽돌을 넣을 배열
+
+        let sensorArray = []; //센서를 넣을 배열
+
+        //1)
+        function createBrick() {
+            for (let i = 0; i < 25; i++) {
+                //container, src, width, height, x, y, velX, velY
+                brickArray.push(new Brick(wrapper, "./images/brick.png", 40, 40, i * 40, 600, 0, 0));
+            }
+        }
+
+        //2)
+        function createMario() {
+            //container, src, width, height, x, y, velX, velY
+            mario = new Mario(wrapper, "./images/mario.png", 50, 60, 200, 10, 0, 5);
+        }
+
+        function createSensor() {
+            //상하 | 좌우 센서 따로??
+            let sensorLeft= new Sensor(wrapper, 1, 40, 0, 0, 2, 2, "red"); //좌[0]
+            sensorArray.push(sensorLeft);
+        
+            //container, width, height, x, y, velX, velY, bg
+            let sensorTop = new Sensor(wrapper, 40, 1, 0, 0, 2, 2, "red"); //상[1]
+            sensorArray.push(sensorTop);
+            
+            //container, width, height, x, y, velX, velY, bg
+            let sensorRight= new Sensor(wrapper, 1, 40, 0, 0, 2, 2, "red"); //우[2]
+            sensorArray.push(sensorRight);
+
+            let sensorBottom= new Sensor(wrapper, 40, 1, 0, 0, 2, 2, "red"); //하[3]
+            sensorArray.push(sensorBottom);
+
+
+            // sensorArray[i]=sensor;
+
+
+        }
+
+        function setSensor() {
+            //모든 센서는 마리오의 x,y를 기준으로 변경되어야 하므로.
+            sensorArray[0].x=mario.x-1; //좌
+            sensorArray[0].y=mario.y+5;
+
+            sensorArray[1].x = mario.x + 5; //상
+            sensorArray[1].y = mario.y-1; 
+
+            sensorArray[2].x=mario.x+mario.width-1; //우
+            sensorArray[2].y=mario.y+5;
+
+            sensorArray[3].x=mario.x+5; //하
+            sensorArray[3].y=mario.y+mario.height;
+            
+
+        }
+
+        //2-1)
+        //게임에 등장하는 객체 중 움직임이 있는 객체의 tick(), render() 호출
+        function loop() {
+            if (flag) {
+                mario.tick();
+                mario.render();
+
+                
+                for (let i = 0; i < sensorArray.length; i++) {
+
+                    sensorArray[i].tick();
+                    sensorArray[i].render();
+
+                    setSensor();
+                }
+              
+            }
+        }
+
+        //3)
+        function jump() {
+            mario.velY = -4;
+        }
+
+        function moveX(n) {
+            mario.velX = n;
+        }
+
+        //0)
+        function init() {
+            wrapper = document.getElementById("wrapper");
+
+            createBrick(); //벽돌 생성하기
+            createMario(); //플레이어(마리오) 생성하기
+
+            createSensor(); //플레이어를 따라다닐 센서 생성
+        }
+
+        //0)-----제이쿼리 onLoad
+        $(function () {
+            init();
+
+            setInterval("loop()", 5);
+
+            $(document.body).on("keydown", function (e) {
+                switch (e.keyCode) {
+                    case 37: moveX(-3); break; //좌
+                    case 39: moveX(3); break; //우
+                    case 32: jump(); break; //점프
+                    case 27: flag = !flag; break; //Esc
+                }
+            });
+            $(document.body).on("keyup", function (e) {
+                switch (e.keyCode) {
+                    case 37: moveX(0); break; //좌
+                    case 39: moveX(0); break; //우
+
+                }
+            });
+        });
+    </script>
+</head>
+
+<body>
+    <div id="wrapper"></div>
+</body>
+
+</html>
